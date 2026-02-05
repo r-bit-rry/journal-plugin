@@ -3,13 +3,15 @@
 ## Entry at {{TIME}}
 {{AUTO_MARKER}}
 
+**Highlight:** {{SESSION_HIGHLIGHT}}
+
 ### What Was Done
 {{WHAT_DONE}}
 
 ### What Went Well
 {{WHAT_WENT_WELL}}
 
-### What Didnt Work
+### What Didn't Work
 {{WHAT_DIDNT_WORK}}
 
 ### Lessons Learned
@@ -22,7 +24,7 @@
 **Anti-patterns:**
 {{ANTI_PATTERNS}}
 
-### User Guidance Captured
+### User Guidance
 {{USER_GUIDANCE}}
 
 ### Open Questions

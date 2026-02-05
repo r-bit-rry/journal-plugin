@@ -44,7 +44,8 @@ def main():
 
 ### Behavioral Guidelines
 - Watch for recurring themes, successes, and failures during this session
-- Detect patterns in user preferences, successful approaches, and anti-patterns
+- Only flag patterns after 3+ occurrences — avoid noise, surface real patterns
+- When quoting user guidance, use their exact words
 - When significant insights emerge, remind user to run `/log` to capture them
 - Reference past patterns when making decisions or suggestions
 

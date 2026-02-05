@@ -30,27 +30,20 @@ Create or update a daily journal entry capturing session insights.
 
    Analyze the conversation and extract:
 
+   - **Session Highlight**: The single most significant outcome (PR merged, bug fixed, feature shipped, test suite passing). One line, auto-extracted from tool outputs and conversation.
    - **What Was Done**: Key tasks, changes, or actions completed
    - **What Went Well**: Successful approaches, smooth implementations
    - **What Didn't Work**: Failed attempts, obstacles encountered, workarounds needed
    - **Lessons Learned**: New knowledge gained, insights about the codebase or tools
-   - **Patterns Discovered**:
+   - **Patterns Discovered** (only add if seen 3+ times in recent sessions):
      - Good patterns: Approaches that worked well and should be repeated
      - Anti-patterns: Approaches that failed or caused problems
-   - **User Guidance Captured**: Preferences, conventions, or instructions the user provided
+   - **User Guidance Captured**: Quote user preferences/instructions exactly as they said them
    - **Open Questions**: Unresolved issues, things to investigate later
 
-4. **Interactive vs Auto mode:**
-
-   **If `--auto` flag is present:**
-   - Skip user confirmation
-   - Write insights directly to journal
-   - Add `[Auto-generated: context compact]` marker to entry
-
-   **If interactive (default):**
-   - Present extracted insights to the user in a readable format
-   - Ask if they want to confirm, edit, or add anything
-   - Incorporate any user feedback before writing
+4. **Write directly:**
+   - Extract insights and write immediately (tool permissions handle user consent)
+   - If `--auto` flag is present, add `[Auto-generated: context compact]` marker to entry
 
 5. **Write to journal file:**
    - File path: `journal/YYYY-MM-DD.md` (using current date)
@@ -61,6 +54,8 @@ Create or update a daily journal entry capturing session insights.
    ```markdown
    ## Entry at HH:MM
    [Auto-generated: context compact] <!-- only if --auto -->
+
+   **Highlight:** [single most significant outcome]
 
    ### What Was Done
    - [items]
@@ -81,8 +76,8 @@ Create or update a daily journal entry capturing session insights.
    **Anti-patterns:**
    - [items]
 
-   ### User Guidance Captured
-   - [items]
+   ### User Guidance
+   > '[exact user quote]' — [context]
 
    ### Open Questions
    - [items]
@@ -97,5 +92,5 @@ Create or update a daily journal entry capturing session insights.
    - Update "Last Updated" date in manifest
 
 7. **Confirm completion:**
-   - Tell user the journal entry was saved
-   - Mention any new patterns added to manifest
+   - Brief: "Logged." or "Logged. Added [N] new patterns."
+   - No ceremony. Back to work.
