@@ -33,10 +33,10 @@ claude /plugin install /path/to/journal-plugin
 
 ```bash
 # Add local marketplace first
-claude /marketplace add ./marketplace.json
+claude plugin marketplace add /path/to/journal-plugin
 
 # Then install by name
-claude /plugin install journal-plugin
+claude plugin install journal-plugin
 ```
 
 ### Manual Installation
