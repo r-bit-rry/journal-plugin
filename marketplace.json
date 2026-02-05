@@ -1,0 +1,22 @@
+{
+  "$schema": "https://claude.ai/schemas/marketplace.json",
+  "name": "journal-plugin-marketplace",
+  "version": "1.0.0",
+  "description": "Marketplace for journal-plugin",
+  "owner": {
+    "name": "r-bit-rry",
+    "email": "dev@example.com"
+  },
+  "plugins": [
+    {
+      "name": "journal-plugin",
+      "source": "./",
+      "description": "Session logging and pattern tracking for Claude Code",
+      "category": "productivity",
+      "version": "1.0.0",
+      "author": {
+        "name": "r-bit-rry"
+      }
+    }
+  ]
+}

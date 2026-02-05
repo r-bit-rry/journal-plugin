@@ -1,0 +1,17 @@
+{
+  "description": "Journal plugin hooks for session context and auto-logging",
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks-handlers/session-start.py\""
+      }
+    ],
+    "PreCompact": [
+      {
+        "type": "command",
+        "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks-handlers/pre-compact.py\""
+      }
+    ]
+  }
+}

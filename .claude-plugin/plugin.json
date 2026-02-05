@@ -1,0 +1,11 @@
+{
+  "name": "journal-plugin",
+  "version": "1.0.0",
+  "description": "Session logging and pattern tracking for Claude Code",
+  "author": {
+    "name": "rbelio"
+  },
+  "repository": "https://github.com/r-bit-rry/journal-plugin",
+  "license": "MIT",
+  "keywords": ["journal", "logging", "patterns", "retrospective"]
+}
