@@ -3,7 +3,7 @@ allowed-tools:
   - Read
   - Write
   - Bash(ls:*)
-  - Bash(date:*)
+  - Bash(node:*)
 ---
 
 # Log Command
@@ -22,9 +22,9 @@ Create or update a daily journal entry capturing session insights.
 
 2. **Get current date and time:**
    ```bash
-   date +%Y-%m-%d
-   date +%H:%M
+   node -e "const d=new Date(),p=n=>String(n).padStart(2,'0'),D='Sunday Monday Tuesday Wednesday Thursday Friday Saturday'.split(' '),M='January February March April May June July August September October November December'.split(' ');console.log(D[d.getDay()]+' '+M[d.getMonth()]+' '+p(d.getDate())+', '+d.getFullYear()+' '+p(d.getHours())+':'+p(d.getMinutes()));console.log(d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()))"
    ```
+   First line of output is `FULL_DATE`, second line is `FILE_DATE`.
 
 3. **Extract insights from the current conversation:**
 
@@ -46,13 +46,13 @@ Create or update a daily journal entry capturing session insights.
    - If `--auto` flag is present, add `[Auto-generated: context compact]` marker to entry
 
 5. **Write to journal file:**
-   - File path: `journal/YYYY-MM-DD.md` (using current date)
+   - File path: `journal/FILE_DATE.md` (e.g. `journal/2026-02-14.md`)
    - If file exists, append new entry with `---` separator
    - If file doesn't exist, create with header
 
    Entry format:
    ```markdown
-   ## Entry at HH:MM
+   ## Entry FULL_DATE
    [Auto-generated: context compact] <!-- only if --auto -->
 
    **Highlight:** [single most significant outcome]
@@ -85,8 +85,12 @@ Create or update a daily journal entry capturing session insights.
    ---
    ```
 
-6. **Update manifest patterns:**
-   - If new patterns were identified, update the "Identified Patterns" section in `journal/manifest.md`
+6. **Update manifest patterns (only if changed):**
+   - Read `journal/manifest.md` and compare extracted patterns against existing ones
+   - **Skip the manifest write entirely** if no new patterns were discovered
+   - Before adding a pattern, check if a semantically equivalent one already exists — if so, update it (e.g. increment N count) instead of adding a duplicate
+   - Only update "Last Updated" date when manifest content actually changes, using the `FULL_DATE` format
+   - Perform a single write with all changes consolidated — never multiple sequential edits to the manifest
    - Add new good patterns to "### Good Patterns (Keep Doing)"
    - Add new anti-patterns to "### Anti-Patterns (Avoid)"
    - Update "Last Updated" date in manifest

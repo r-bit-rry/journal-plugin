@@ -119,8 +119,8 @@ your-project/
 - Mixed (adapts to content)
 
 ### Context Depth
-- 3 journals (minimal)
-- 7 journals (recommended)
+- 3 journals (recommended)
+- 7 journals (extended)
 - 14 journals (extensive)
 - All journals
 

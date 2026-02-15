@@ -1,6 +1,6 @@
 # Journal: {{DATE}}
 
-## Entry at {{TIME}}
+## Entry {{FULL_DATE}}
 {{AUTO_MARKER}}
 
 **Highlight:** {{SESSION_HIGHLIGHT}}

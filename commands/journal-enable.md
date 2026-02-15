@@ -45,8 +45,8 @@ Initialize journal tracking for this project.
    **Question 5 - Context Depth:**
    Ask: "How many past journal entries should be loaded for context?"
    Options:
-   - 3 journals (minimal)
-   - 7 journals (recommended)
+   - 3 journals (recommended)
+   - 7 journals (extended)
    - 14 journals (extensive)
    - All journals
 
@@ -70,8 +70,12 @@ Initialize journal tracking for this project.
 
 4. Create `journal/manifest.md` using the template from `templates/manifest-template.md`, filling in user responses
 
-5. Check if `CLAUDE.md` exists in project root:
-   - If exists, append the journal reference section (if not already present)
+5. Add `journal/` to `.gitignore`:
+   - If `.gitignore` exists, read it first — only append `journal/` if not already present
+   - If `.gitignore` doesn't exist, create it with `journal/` as the sole entry
+
+6. Check if `CLAUDE.md` exists in project root:
+   - If exists, read its contents first — only append the journal section if no `Journal Plugin` section already exists
    - If not exists, create it with the journal reference
 
    Add this section:
@@ -80,7 +84,7 @@ Initialize journal tracking for this project.
    This project uses journal-plugin for session logging. Run `/log` to capture insights.
    ```
 
-6. Confirm to user that journal has been enabled and explain:
+7. Confirm to user that journal has been enabled and explain:
    - Journal entries will be stored in `journal/` directory
    - Run `/log` to capture session insights
    - Context from past journals will be loaded on session start
