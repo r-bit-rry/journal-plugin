@@ -17,14 +17,17 @@ Create or update a daily journal entry capturing session insights.
 ## Instructions
 
 1. **Verify journal is enabled:**
-   - Check if `journal/manifest.md` exists
-   - If not, inform user to run `/journal-enable` first and stop
+   - Read `journal/manifest.md` — if the file doesn't exist, inform user to run `/journal-enable` first and stop
 
 2. **Get current date and time:**
-   ```bash
-   node -e "const d=new Date(),p=n=>String(n).padStart(2,'0'),D='Sunday Monday Tuesday Wednesday Thursday Friday Saturday'.split(' '),M='January February March April May June July August September October November December'.split(' ');console.log(D[d.getDay()]+' '+M[d.getMonth()]+' '+p(d.getDate())+', '+d.getFullYear()+' '+p(d.getHours())+':'+p(d.getMinutes()));console.log(d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()))"
-   ```
-   First line of output is `FULL_DATE`, second line is `FILE_DATE`.
+   - Use your known current date (from system context `# currentDate`) for the date portion
+   - Get the current time via node:
+     ```bash
+     node -e "const d=new Date(),p=n=>String(n).padStart(2,'0');console.log(p(d.getHours())+':'+p(d.getMinutes()))"
+     ```
+   - Combine into:
+     - `FULL_DATE`: `DayOfWeek Month DD, YYYY HH:MM` (e.g. `Tuesday February 17, 2026 12:07`)
+     - `FILE_DATE`: `YYYY-MM-DD` (e.g. `2026-02-17`) — derived entirely from system context
 
 3. **Extract insights from the current conversation:**
 
