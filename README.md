@@ -80,6 +80,16 @@ This extracts and saves:
 - User guidance captured
 - Open questions
 
+### Review & Archive
+
+Synthesize old entries and clean up patterns:
+
+```
+/journal-review
+```
+
+This consolidates entries older than 7 days into a synthesis document, archives originals, and deduplicates manifest patterns.
+
 ### Auto-Logging
 
 The plugin automatically prompts to save insights before context compaction to prevent losing valuable session information.
@@ -92,6 +102,7 @@ After enabling, your project will have:
 your-project/
 ├── journal/
 │   ├── manifest.md      # Project config and identified patterns
+│   ├── archive/          # Synthesized old entries
 │   ├── 2025-02-05.md    # Daily journal entries
 │   └── ...
 └── CLAUDE.md            # Updated with journal reference
@@ -103,6 +114,7 @@ your-project/
 2. **During Session**: Claude watches for patterns and reminds you to log
 3. **On /log**: Extracts insights from conversation, saves to daily journal
 4. **PreCompact Hook**: Triggers auto-save before context is lost
+5. **On /journal-review**: Synthesizes old entries, archives originals, deduplicates patterns
 
 ## Configuration Options
 
@@ -122,7 +134,6 @@ your-project/
 - 3 journals (recommended)
 - 7 journals (extended)
 - 14 journals (extensive)
-- All journals
 
 ## License
 

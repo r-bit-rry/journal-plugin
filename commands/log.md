@@ -3,7 +3,7 @@ allowed-tools:
   - Read
   - Write
   - Bash(ls:*)
-  - Bash(node:*)
+  - Bash(node -e:*)
 ---
 
 # Log Command

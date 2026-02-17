@@ -7,8 +7,8 @@ const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 const formatDate = (d, time = false) =>
-    `${DAYS[d.getDay()]} ${MONTHS[d.getMonth()]} ${pad(d.getDate())}` +
-    (time ? `, ${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}` : '');
+    `${DAYS[d.getDay()]} ${MONTHS[d.getMonth()]} ${pad(d.getDate())}, ${d.getFullYear()}` +
+    (time ? ` ${pad(d.getHours())}:${pad(d.getMinutes())}` : '');
 
 function parseJournalDate(filename) {
     const m = filename.match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -43,18 +43,36 @@ try {
     if (!existsSync(manifestPath)) { console.log('{}'); process.exit(0); }
 
     const manifest = readFileSync(manifestPath, 'utf-8');
-    const contextDepth = +(manifest.match(/Context Depth\**:\s*(\d+)/)?.[1] ?? 3);
+    const contextDepth = +(manifest.match(/context\s*depth[*:\s]*(\d+)/i)?.[1] ?? 3);
 
     const journalDir = join(projectDir, 'journal');
     const journalFiles = existsSync(journalDir)
         ? readdirSync(journalDir).filter(f => f.endsWith('.md') && f !== 'manifest.md').sort().reverse().map(f => join(journalDir, f))
         : [];
 
+    const MAX_CONTEXT_BYTES = 8000;
     let recentJournals = '';
+    let bytesUsed = 0;
+
     for (const f of journalFiles.slice(0, contextDepth)) {
-        try { recentJournals += `\n\n---\n### ${basename(f, '.md')}\n${readFileSync(f, 'utf-8')}`; }
-        catch (e) { process.stderr.write(`journal-plugin: could not read ${basename(f)}: ${e.message}\n`); }
+        try {
+            const content = readFileSync(f, 'utf-8');
+            const entry = `\n\n---\n### ${basename(f, '.md')}\n${content}`;
+            if (bytesUsed + entry.length > MAX_CONTEXT_BYTES) {
+                const remaining = MAX_CONTEXT_BYTES - bytesUsed;
+                if (remaining > 200) {
+                    recentJournals += entry.slice(0, remaining) + '\n\n[truncated — run /log to view full entry]';
+                    bytesUsed += remaining;
+                }
+                break;
+            }
+            recentJournals += entry;
+            bytesUsed += entry.length;
+        } catch (e) {
+            process.stderr.write(`journal-plugin: could not read ${basename(f)}: ${e.message}\n`);
+        }
     }
+    process.stderr.write(`journal-plugin: loaded ${bytesUsed} bytes of journal context\n`);
 
     const patternsMatch = manifest.includes('## Identified Patterns') && manifest.match(/## Identified Patterns([\s\S]+?)(?=\n## |\s*$)/);
     const patterns = patternsMatch ? patternsMatch[1].trim() : '';

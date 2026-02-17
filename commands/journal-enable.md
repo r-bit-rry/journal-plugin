@@ -48,7 +48,6 @@ Initialize journal tracking for this project.
    - 3 journals (recommended)
    - 7 journals (extended)
    - 14 journals (extensive)
-   - All journals
 
    **Question 6 - Domain Sections:**
    Ask: "Any domain-specific areas to track? (e.g., API changes, performance metrics, security considerations)"
