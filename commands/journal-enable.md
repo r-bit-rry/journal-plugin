@@ -4,6 +4,8 @@ allowed-tools:
   - Write
   - Bash(mkdir:*)
   - Bash(ls:*)
+  - Bash(mv:*)
+  - Bash(rmdir:*)
   - AskUserQuestion
 ---
 
@@ -13,8 +15,28 @@ Initialize journal tracking for this project.
 
 ## Instructions
 
-1. First, check if `journal/manifest.md` already exists in the project:
+0. **Detect environment:**
+   - Check if `.git/` exists and is a directory (not a file)
+   - If yes: this is a **git repo** — journal directory is `.git/journal/`
+   - If no: this is a **plain directory** — journal directory is `journal/`
+   - Store this decision for all subsequent steps
+
+1. First, check if `{journal-dir}/manifest.md` already exists:
    - If it exists, warn the user that journal is already enabled and ask if they want to reconfigure
+
+1b. **Check for legacy location (git repos only):**
+    - If this is a git repo AND `journal/manifest.md` exists AND `.git/journal/manifest.md` does NOT exist:
+      - Inform user: "Found journal data in `journal/` (legacy location). The new location `.git/journal/` persists across branch switches."
+      - Ask: "Migrate existing journal data to `.git/journal/`?"
+      - If yes:
+        - Create `.git/journal/` directory
+        - Move all files from `journal/` to `.git/journal/`
+        - If `journal/archive/` exists, move it too
+        - Remove the now-empty `journal/` directory
+        - Remove the `journal/` line from `.gitignore` if present
+        - Confirm: "Migration complete. Journal data now in `.git/journal/`."
+        - Stop (config is preserved, no need to re-run wizard)
+      - If no: continue using `journal/` location
 
 2. Run an interactive wizard asking the user:
 
@@ -64,14 +86,15 @@ Initialize journal tracking for this project.
 
 3. Create the journal directory:
    ```bash
-   mkdir -p journal
+   mkdir -p {journal-dir}
    ```
 
-4. Create `journal/manifest.md` using the template from `templates/manifest-template.md`, filling in user responses
+4. Create `{journal-dir}/manifest.md` using the template from `templates/manifest-template.md`, filling in user responses
 
-5. Add `journal/` to `.gitignore`:
-   - If `.gitignore` exists, read it first — only append `journal/` if not already present
-   - If `.gitignore` doesn't exist, create it with `journal/` as the sole entry
+5. **Handle gitignore (only if using `journal/` in a git repo):**
+   - If journal directory is `.git/journal/`: **skip this step entirely** (inherently untracked)
+   - If journal directory is `journal/` AND `.gitignore` exists: append `journal/` if not already present
+   - If journal directory is `journal/` AND no `.gitignore`: do nothing
 
 6. Check if `CLAUDE.md` exists in project root:
    - If exists, read its contents first — only append the journal section if no `Journal Plugin` section already exists
@@ -84,6 +107,6 @@ Initialize journal tracking for this project.
    ```
 
 7. Confirm to user that journal has been enabled and explain:
-   - Journal entries will be stored in `journal/` directory
-   - Run `/log` to capture session insights
+   - If git repo: "Journal entries stored in `.git/journal/` — persists across branch switches. Run `/log` to capture insights."
+   - If plain directory: "Journal entries stored in `journal/`. Run `/log` to capture insights."
    - Context from past journals will be loaded on session start

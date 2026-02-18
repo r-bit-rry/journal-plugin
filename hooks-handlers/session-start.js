@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const { readFileSync, readdirSync, existsSync } = require('fs');
+const { readFileSync, readdirSync, existsSync, statSync } = require('fs');
 const { join, basename } = require('path');
 
 const pad = n => String(n).padStart(2, '0');
@@ -38,17 +38,31 @@ function buildTemporalContext(journalFiles) {
 
 try {
     const projectDir = process.env.CLAUDE_PROJECT_DIR || '.';
-    const manifestPath = join(projectDir, 'journal', 'manifest.md');
+    const gitPath = join(projectDir, '.git');
+    const isGitRepo = existsSync(gitPath) && statSync(gitPath).isDirectory();
 
-    if (!existsSync(manifestPath)) { console.log('{}'); process.exit(0); }
+    const gitJournalDir = join(gitPath, 'journal');
+    const plainJournalDir = join(projectDir, 'journal');
 
-    const manifest = readFileSync(manifestPath, 'utf-8');
+    let journalDir;
+    if (isGitRepo) {
+        if (existsSync(join(gitJournalDir, 'manifest.md'))) journalDir = gitJournalDir;
+        else if (existsSync(join(plainJournalDir, 'manifest.md'))) {
+            process.stderr.write('journal-plugin: found journal/ in project root — run /journal-enable to migrate to .git/journal/\n');
+            journalDir = plainJournalDir;
+        }
+    } else {
+        if (existsSync(join(plainJournalDir, 'manifest.md'))) journalDir = plainJournalDir;
+    }
+
+    if (!journalDir) { console.log('{}'); process.exit(0); }
+
+    const manifest = readFileSync(join(journalDir, 'manifest.md'), 'utf-8');
     const contextDepth = +(manifest.match(/context\s*depth[*:\s]*(\d+)/i)?.[1] ?? 3);
 
-    const journalDir = join(projectDir, 'journal');
-    const journalFiles = existsSync(journalDir)
-        ? readdirSync(journalDir).filter(f => f.endsWith('.md') && f !== 'manifest.md').sort().reverse().map(f => join(journalDir, f))
-        : [];
+    const journalFiles = readdirSync(journalDir)
+        .filter(f => f.endsWith('.md') && f !== 'manifest.md').sort().reverse()
+        .map(f => join(journalDir, f));
 
     const MAX_CONTEXT_BYTES = 8000;
     let recentJournals = '';

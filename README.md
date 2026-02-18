@@ -96,8 +96,21 @@ The plugin automatically prompts to save insights before context compaction to p
 
 ## File Structure
 
-After enabling, your project will have:
+After enabling, journal data is stored in the most durable location available:
 
+**In a git repository:**
+```
+your-project/
+├── .git/
+│   └── journal/
+│       ├── manifest.md      # Project config and identified patterns
+│       ├── archive/          # Synthesized old entries
+│       ├── 2025-02-05.md    # Daily journal entries
+│       └── ...
+└── CLAUDE.md                # Updated with journal reference
+```
+
+**In a plain directory (no git):**
 ```
 your-project/
 ├── journal/
@@ -107,6 +120,8 @@ your-project/
 │   └── ...
 └── CLAUDE.md            # Updated with journal reference
 ```
+
+> **Why `.git/journal/`?** In git repos, storing journals inside the git directory means they persist across branch switches, stashes, and `git clean` — without committing or gitignoring. In non-git directories, `journal/` is used directly.
 
 ## How It Works
 
