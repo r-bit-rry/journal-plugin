@@ -1,6 +1,6 @@
-# Journal Plugin for Claude Code
+# Journal Plugin for Claude Code & OpenCode
 
-Session logging and pattern tracking for Claude Code. Captures insights, tracks patterns, and maintains continuity across development sessions.
+Session logging and pattern tracking for Claude Code and OpenCode. Captures insights, tracks patterns, and maintains continuity across development sessions.
 
 ## Features
 
@@ -11,15 +11,49 @@ Session logging and pattern tracking for Claude Code. Captures insights, tracks 
 
 ## Installation
 
-### From GitHub (recommended)
+### OpenCode
+
+#### Manual (recommended)
+
+```bash
+git clone https://github.com/r-bit-rry/journal-plugin ~/journal-plugin
+
+# Symlink into global OpenCode config
+ln -s ~/journal-plugin/opencode/commands ~/.config/opencode/commands
+ln -s ~/journal-plugin/opencode/plugins  ~/.config/opencode/plugins
+ln -s ~/journal-plugin/opencode/skills   ~/.config/opencode/skills
+```
+
+Then add the following to `~/.config/opencode/AGENTS.md` (create it if it doesn't exist):
+
+```markdown
+## Journal Plugin
+
+At the start of every session, load the `journal-context` skill to restore continuity from past sessions:
+
+```
+skill({ name: "journal-context" })
+```
+
+This will read the project manifest, recent journal entries, and identified patterns into context.
+If the journal is not yet enabled for the current project, skip this step silently.
+
+After loading, apply all behavioral guidelines from the skill for the rest of the session.
+```
+
+The plugin (`opencode/plugins/journal-plugin.ts`) is picked up automatically from the plugins directory. No `opencode.json` changes needed.
+
+---
+
+### Claude Code
+
+#### From GitHub (recommended)
 
 ```bash
 claude plugin install github:r-bit-rry/journal-plugin
 ```
 
-### Local Installation
-
-Install directly from a local directory:
+#### Local Installation
 
 ```bash
 # From the plugin directory
@@ -29,7 +63,7 @@ claude /plugin install .
 claude /plugin install /path/to/journal-plugin
 ```
 
-### Via Marketplace
+#### Via Marketplace
 
 ```bash
 # Add local marketplace first
@@ -39,9 +73,7 @@ claude plugin marketplace add /path/to/journal-plugin
 claude plugin install journal-plugin
 ```
 
-### Manual Installation
-
-Add to your Claude Code settings:
+#### Manual Installation
 
 ```bash
 claude settings add plugins "file:///path/to/journal-plugin"
@@ -107,7 +139,7 @@ your-project/
 │       ├── archive/          # Synthesized old entries
 │       ├── 2025-02-05.md    # Daily journal entries
 │       └── ...
-└── CLAUDE.md                # Updated with journal reference
+└── AGENTS.md                # Updated with journal reference (CLAUDE.md for Claude Code)
 ```
 
 **In a plain directory (no git):**
@@ -118,18 +150,55 @@ your-project/
 │   ├── archive/          # Synthesized old entries
 │   ├── 2025-02-05.md    # Daily journal entries
 │   └── ...
-└── CLAUDE.md            # Updated with journal reference
+└── AGENTS.md            # Updated with journal reference (CLAUDE.md for Claude Code)
 ```
 
 > **Why `.git/journal/`?** In git repos, storing journals inside the git directory means they persist across branch switches, stashes, and `git clean` — without committing or gitignoring. In non-git directories, `journal/` is used directly.
 
 ## How It Works
 
-1. **SessionStart Hook**: Loads manifest and recent journals into context
+### Claude Code
+1. **SessionStart Hook**: Loads manifest and recent journals directly into LLM context
 2. **During Session**: Claude watches for patterns and reminds you to log
 3. **On /log**: Extracts insights from conversation, saves to daily journal
 4. **PreCompact Hook**: Triggers auto-save before context is lost
 5. **On /journal-review**: Synthesizes old entries, archives originals, deduplicates patterns
+
+### OpenCode
+1. **AGENTS.md instruction**: Agent loads the `journal-context` skill at session start, which reads journal files into context
+2. **Plugin `session.created`**: Logs journal status to stderr (entry count, project goal)
+3. **Plugin `experimental.session.compacting`**: Injects full journal context into the compaction prompt so insights survive compaction boundaries — richer than Claude's PreCompact warning
+4. **On /log**: Same as Claude Code — extracts and saves insights
+5. **On /journal-review**: Same as Claude Code — synthesizes, archives, deduplicates
+
+## Repository Structure
+
+```
+journal-plugin/
+├── lib/
+│   └── journal-core.js          # Shared logic (dir resolution, context building)
+├── hooks-handlers/              # Claude Code hook scripts
+│   ├── session-start.js
+│   └── pre-compact.js
+├── hooks/
+│   └── hooks.json               # Claude Code hook registry
+├── commands/                    # Claude Code commands
+│   ├── log.md
+│   ├── journal-enable.md
+│   └── journal-review.md
+├── opencode/                    # OpenCode-specific files
+│   ├── commands/                # OpenCode commands (same logic, OC frontmatter)
+│   │   ├── log.md
+│   │   ├── journal-enable.md
+│   │   └── journal-review.md
+│   ├── plugins/
+│   │   └── journal-plugin.ts    # OpenCode plugin (session + compaction hooks)
+│   └── skills/
+│       └── journal-context/
+│           └── SKILL.md         # On-demand journal context loader
+└── templates/
+    └── manifest-template.md
+```
 
 ## Configuration Options
 
